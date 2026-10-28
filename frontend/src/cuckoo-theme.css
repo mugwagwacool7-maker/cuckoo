@@ -1,0 +1,222 @@
+:root {
+  --cuckoo-forest-900: #0b241c;
+  --cuckoo-forest-800: #0f3227;
+  --cuckoo-forest-700: #174737;
+  --cuckoo-forest-600: #23604a;
+  --cuckoo-moss: #4f7462;
+  --cuckoo-gold: #e8a33d;
+  --cuckoo-gold-deep: #a86415;
+  --cuckoo-gold-soft: #f7e3bf;
+  --cuckoo-cream: #faf7f0;
+  --cuckoo-paper: #fffdf9;
+  --cuckoo-ink: #16231d;
+}
+
+body {
+  background-color: var(--cuckoo-cream);
+  color: var(--cuckoo-ink);
+}
+
+.navigation {
+  background-color: var(--cuckoo-forest-900) !important;
+}
+
+.navigation .navlink,
+.navigation .w-nav-link,
+.navigation .w-dropdown-toggle,
+.navigation .navdrop-link {
+  color: var(--cuckoo-paper);
+}
+
+.navigation .navlink.w--current,
+.navigation .w-nav-link.w--current,
+.navigation .navdrop-link:hover {
+  color: var(--cuckoo-gold) !important;
+}
+
+.navigation .w-dropdown-list {
+  background-color: var(--cuckoo-forest-800);
+}
+
+.button-arrow-pill,
+.primary-button,
+.primary-button .button-arrow-pill {
+  background-color: var(--cuckoo-gold) !important;
+  color: var(--cuckoo-forest-900) !important;
+}
+
+.button-animated-color {
+  background-color: var(--cuckoo-forest-700) !important;
+}
+
+.button-arrow-pill svg,
+.primary-button svg {
+  color: var(--cuckoo-forest-900);
+}
+
+.bg-blue,
+.story-card.bg-blue {
+  background-color: var(--cuckoo-forest-800) !important;
+  color: var(--cuckoo-paper);
+}
+
+.story-card.bg-blue :is(h1, h2, h3, h4, p, a, span, div) {
+  color: inherit;
+}
+
+.section.black,
+.footer,
+.package-card,
+.package-icon-wrapper {
+  background-color: var(--cuckoo-forest-900) !important;
+}
+
+.section.blue {
+  background-color: var(--cuckoo-gold-soft) !important;
+}
+
+.blue-line,
+.choose-icon-wrapper,
+.destination-icon-wrapper {
+  background-color: var(--cuckoo-forest-700) !important;
+}
+
+.choose-arrow-wrapper {
+  background-color: var(--cuckoo-gold-soft) !important;
+}
+
+.story-icon-wrapper,
+.gallery-badge {
+  background-color: var(--cuckoo-gold-soft) !important;
+}
+
+.section.cta {
+  background-image:
+    linear-gradient(90deg, rgba(11, 36, 28, 0.96), rgba(15, 50, 39, 0.76) 65%, rgba(11, 36, 28, 0.18)),
+    url("https://lirp.cdn-website.com/e6c865a4/dms3rep/multi/opt/Lion+under+a+thunderstorm-1920w.JPG") !important;
+  background-position: center;
+  background-size: cover;
+}
+
+.home-hero-area {
+  background-color: var(--cuckoo-forest-900);
+  background-image:
+    linear-gradient(rgba(11, 36, 28, 0.22), rgba(11, 36, 28, 0.72)),
+    url("https://lirp.cdn-website.com/e6c865a4/dms3rep/multi/opt/Lion+under+a+thunderstorm-1920w.JPG") !important;
+  background-position: center;
+  background-size: cover;
+}
+
+.home-hero-area > .hero-color-shape,
+.home-hero-area .hero-image-wrapper .bg-video video,
+.color-shape {
+  display: none !important;
+}
+
+.home-hero-area .hero-image-wrapper .bg-video {
+  background-image: url("https://irp.cdn-website.com/e6c865a4/dms3rep/multi/opt/Victoria-Falls-1+%281%29-1920w.jpeg") !important;
+  background-position: center;
+  background-size: cover;
+}
+
+.home-hero-area .hero-image-wrapper .w-background-video--control {
+  display: none !important;
+}
+
+.about-hero-block {
+  background-image:
+    linear-gradient(rgba(11, 36, 28, 0.12) 20%, rgba(11, 36, 28, 0.7) 58%, var(--cuckoo-forest-900) 92%),
+    url("https://lirp.cdn-website.com/e6c865a4/dms3rep/multi/opt/Lion+under+a+thunderstorm-1920w.JPG") !important;
+  background-position: center;
+  background-size: cover;
+}
+
+.hero-pill-icon {
+  color: var(--cuckoo-gold) !important;
+}
+
+.packages-hero-area {
+  background-image:
+    linear-gradient(rgba(11, 36, 28, 0.26), rgba(11, 36, 28, 0.88)),
+    url("https://irp.cdn-website.com/e6c865a4/dms3rep/multi/opt/Victoria-Falls-1+%281%29-1920w.jpeg") !important;
+  background-position: center;
+  background-size: cover;
+}
+
+.packages-hero-area p {
+  color: var(--cuckoo-paper) !important;
+  text-shadow: 0 1px 3px rgba(11, 36, 28, 0.65);
+}
+
+.destination-hero-area {
+  background-image:
+    linear-gradient(rgba(11, 36, 28, 0.3), rgba(11, 36, 28, 0.7)),
+    url("https://irp.cdn-website.com/e6c865a4/dms3rep/multi/opt/Victoria-Falls-1+%281%29-1920w.jpeg") !important;
+  background-position: center;
+  background-size: cover;
+}
+
+.destination-overlay,
+.destination-overlay.bottom {
+  background-image: linear-gradient(transparent, var(--cuckoo-cream) 88%) !important;
+}
+
+.choose-overlay {
+  background-image: linear-gradient(
+    var(--cuckoo-gold-soft) 2%,
+    transparent 10%,
+    transparent 90%,
+    var(--cuckoo-gold-soft) 98%
+  ) !important;
+}
+
+.section-badge {
+  border-color: rgba(232, 163, 61, 0.42);
+}
+
+.dot,
+.badge-dot {
+  background-color: var(--cuckoo-gold) !important;
+}
+
+.number,
+.arrow {
+  color: var(--cuckoo-forest-700) !important;
+}
+
+.menu-button.w-nav-button {
+  background-color: var(--cuckoo-gold) !important;
+  color: var(--cuckoo-forest-900) !important;
+}
+
+.menu-button svg *,
+.arrow svg * {
+  fill: var(--cuckoo-forest-900) !important;
+  stroke: var(--cuckoo-forest-900) !important;
+}
+
+.footer .footer-link.w--current {
+  background-color: var(--cuckoo-gold) !important;
+  color: var(--cuckoo-forest-900) !important;
+}
+
+.destination-rating-wrapper,
+.rating-wrap {
+  display: none !important;
+}
+
+.w-form-done {
+  background-color: var(--cuckoo-forest-700) !important;
+  color: var(--cuckoo-paper) !important;
+}
+
+a:hover,
+.link-arrow:hover {
+  color: var(--cuckoo-gold-deep);
+}
+
+@media screen and (max-width: 991px) {
+  .navigation.w-nav-menu {
+    background-color: var(--cuckoo-forest-900) !important;
+  }
+}
