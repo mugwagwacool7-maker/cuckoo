@@ -377,8 +377,26 @@ a:hover,
   color: var(--cuckoo-gold-deep);
 }
 
+.nav-brand .nav-logo {
+  display: block;
+  width: auto;
+  height: 56px;
+  max-width: 150px;
+  padding: 4px 8px;
+  border-radius: 10px;
+  background-color: #fff;
+  box-sizing: border-box;
+  object-fit: contain;
+}
+
 @media screen and (max-width: 991px) {
   .navigation.w-nav-menu {
     background-color: var(--cuckoo-green-800) !important;
+  }
+
+  .nav-brand .nav-logo {
+    height: 46px;
+    max-width: 130px;
+    padding: 3px 6px;
   }
 }
