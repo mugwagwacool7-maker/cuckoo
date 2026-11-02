@@ -1,0 +1,384 @@
+:root {
+  --cuckoo-green-900: #283c17;
+  --cuckoo-green-800: #36501f;
+  --cuckoo-green-700: #436326;
+  --cuckoo-green-600: #537b2f;
+  --cuckoo-green-500: #6f9a45;
+  --cuckoo-green-soft: #eef3e2;
+  --cuckoo-on-green: #1b2410;
+  --cuckoo-forest-900: var(--cuckoo-green-600);
+  --cuckoo-forest-800: var(--cuckoo-green-800);
+  --cuckoo-forest-700: var(--cuckoo-green-700);
+  --cuckoo-forest-600: var(--cuckoo-green-800);
+  --cuckoo-moss: var(--cuckoo-green-500);
+  --cuckoo-gold: #e8a33d;
+  --cuckoo-gold-deep: #a86415;
+  --cuckoo-gold-soft: #f7e3bf;
+  --cuckoo-cream: #faf7f0;
+  --cuckoo-paper: #fffdf9;
+  --cuckoo-ink: #16231d;
+}
+
+body {
+  background-color: var(--cuckoo-cream);
+  color: var(--cuckoo-ink);
+}
+
+.navigation {
+  background-color: transparent !important;
+}
+
+.navigation .navlink,
+.navigation .w-nav-link,
+.navigation .w-dropdown-toggle {
+  color: var(--cuckoo-paper);
+  text-shadow: 0 1px 2px rgba(16, 24, 12, 0.45);
+}
+
+.navigation .nav-text {
+  text-shadow: 0 1px 2px rgba(16, 24, 12, 0.45);
+}
+
+.navigation .navlink:hover,
+.navigation .w-nav-link:hover,
+.navigation .w-dropdown-toggle:hover {
+  color: var(--cuckoo-on-green) !important;
+  text-shadow: none;
+}
+
+.navigation .navlink.w--current,
+.navigation .w-nav-link.w--current {
+  color: var(--cuckoo-on-green) !important;
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
+  text-shadow: none;
+}
+
+.navigation .w-dropdown-list {
+  background-color: var(--cuckoo-forest-800);
+}
+
+.navigation .drodown-link-wrap {
+  background-color: transparent !important;
+}
+
+.navigation .navdrop-link {
+  color: var(--cuckoo-paper);
+}
+
+.navigation .navdrop-link:hover {
+  color: var(--cuckoo-gold-soft) !important;
+}
+
+.button-arrow-pill,
+.primary-button,
+.primary-button .button-arrow-pill {
+  background-color: var(--cuckoo-gold) !important;
+  color: var(--cuckoo-on-green) !important;
+}
+
+.button-animated-color {
+  background-color: var(--cuckoo-green-600) !important;
+}
+
+.button-arrow-pill svg,
+.primary-button svg {
+  color: var(--cuckoo-on-green);
+}
+
+.bg-blue,
+.story-card.bg-blue {
+  background-color: var(--cuckoo-forest-900) !important;
+  color: var(--cuckoo-paper);
+}
+
+.story-card.bg-blue :is(h1, h2, h3, h4, p, a, span, div) {
+  color: inherit;
+}
+
+.story-card.bg-blue .story-icon-wrapper,
+.story-card.bg-blue .story-icon-wrapper * {
+  color: var(--cuckoo-on-green) !important;
+}
+
+.section.black,
+.footer,
+.package-card {
+  background-color: var(--cuckoo-forest-900) !important;
+}
+
+.package-icon-wrapper {
+  background-color: var(--cuckoo-green-800) !important;
+}
+
+.footer .footer-navigation {
+  background-color: transparent !important;
+}
+
+.footer :is(p, a, span, div, li, h1, h2, h3, h4, h5, h6) {
+  color: var(--cuckoo-paper) !important;
+}
+
+.footer .footer-link:hover,
+.footer .utility-link:hover {
+  background-color: var(--cuckoo-green-700) !important;
+  color: var(--cuckoo-paper) !important;
+  text-decoration: underline;
+}
+
+.footer .email-address,
+.footer .copyright-text {
+  color: var(--cuckoo-paper) !important;
+}
+
+.footer .footer-text-field {
+  border-color: rgb(255 253 249 / 70%) !important;
+  color: var(--cuckoo-paper) !important;
+}
+
+.footer .footer-text-field::placeholder {
+  color: var(--cuckoo-paper);
+}
+
+.footer .success-message.w-form-done,
+.footer .success-message.w-form-done * {
+  color: var(--cuckoo-paper) !important;
+}
+
+.footer .error-message.w-form-fail {
+  background-color: #fff0ec !important;
+}
+
+.footer .error-message.w-form-fail,
+.footer .error-message.w-form-fail * {
+  color: #8d3424 !important;
+}
+
+.section.black :is(p, a, span, div, li, h1, h2, h3, h4, h5, h6) {
+  color: var(--cuckoo-paper) !important;
+}
+
+.package-card :is(p, a, span, div, li, h1, h2, h3, h4, h5, h6) {
+  color: var(--cuckoo-paper) !important;
+}
+
+.package-card .package-icon-wrapper,
+.package-card .package-icon-wrapper * {
+  color: var(--cuckoo-paper) !important;
+}
+
+.section.black .primary-button,
+.section.black .primary-button *,
+.package-card .primary-button,
+.package-card .primary-button *,
+.footer .primary-button,
+.footer .primary-button * {
+  color: var(--cuckoo-on-green) !important;
+}
+
+.primary-button:hover .button-text-pill,
+.primary-button:hover .button-text-pill * {
+  color: var(--cuckoo-paper) !important;
+}
+
+.section.blue {
+  background-color: var(--cuckoo-gold-soft) !important;
+}
+
+.blue-line {
+  background-color: var(--cuckoo-forest-700) !important;
+}
+
+.choose-icon-wrapper,
+.destination-icon-wrapper {
+  background-color: var(--cuckoo-forest-700) !important;
+  color: var(--cuckoo-paper) !important;
+}
+
+.choose-arrow-wrapper {
+  background-color: var(--cuckoo-gold-soft) !important;
+}
+
+.story-icon-wrapper,
+.gallery-badge {
+  background-color: var(--cuckoo-gold-soft) !important;
+}
+
+.section.cta {
+  background-image:
+    linear-gradient(90deg, rgba(83, 123, 47, 0.96), rgba(54, 80, 31, 0.78) 65%, rgba(40, 60, 23, 0.18)),
+    url("https://lirp.cdn-website.com/e6c865a4/dms3rep/multi/opt/Lion+under+a+thunderstorm-1920w.JPG") !important;
+  background-position: center;
+  background-size: cover;
+}
+
+.home-hero-area {
+  background-color: var(--cuckoo-green-900);
+  background-image:
+    linear-gradient(rgba(83, 123, 47, 0.25), rgba(40, 60, 23, 0.78)),
+    url("https://lirp.cdn-website.com/e6c865a4/dms3rep/multi/opt/Lion+under+a+thunderstorm-1920w.JPG") !important;
+  background-position: center;
+  background-size: cover;
+}
+
+.home-hero-area > .hero-color-shape,
+.home-hero-area .hero-image-wrapper .bg-video video,
+.color-shape {
+  display: none !important;
+}
+
+.home-hero-area .hero-image-wrapper .bg-video {
+  background-image: url("https://irp.cdn-website.com/e6c865a4/dms3rep/multi/opt/Victoria-Falls-1+%281%29-1920w.jpeg") !important;
+  background-position: center;
+  background-size: cover;
+}
+
+.home-hero-area .hero-image-wrapper .w-background-video--control {
+  display: none !important;
+}
+
+.about-hero-block {
+  background-color: var(--cuckoo-green-900);
+  background-image:
+    linear-gradient(rgba(83, 123, 47, 0.15) 20%, rgba(83, 123, 47, 0.68) 58%, var(--cuckoo-green-900) 92%),
+    url("https://lirp.cdn-website.com/e6c865a4/dms3rep/multi/opt/Lion+under+a+thunderstorm-1920w.JPG") !important;
+  background-position: center;
+  background-size: cover;
+}
+
+.hero-pill-icon {
+  color: var(--cuckoo-gold) !important;
+}
+
+.packages-hero-area {
+  background-color: var(--cuckoo-green-900);
+  background-image:
+    linear-gradient(rgba(83, 123, 47, 0.35), rgba(40, 60, 23, 0.9)),
+    url("https://irp.cdn-website.com/e6c865a4/dms3rep/multi/opt/Victoria-Falls-1+%281%29-1920w.jpeg") !important;
+  background-position: center;
+  background-size: cover;
+}
+
+.packages-hero-area p {
+  color: var(--cuckoo-paper) !important;
+  text-shadow: 0 1px 3px rgba(40, 60, 23, 0.65);
+}
+
+.destination-hero-area {
+  background-color: var(--cuckoo-green-900);
+  background-image:
+    linear-gradient(rgba(83, 123, 47, 0.4), rgba(40, 60, 23, 0.78)),
+    url("https://irp.cdn-website.com/e6c865a4/dms3rep/multi/opt/Victoria-Falls-1+%281%29-1920w.jpeg") !important;
+  background-position: center;
+  background-size: cover;
+}
+
+.destination-hero-area p {
+  color: var(--cuckoo-paper) !important;
+  text-shadow: 0 1px 3px rgba(40, 60, 23, 0.65);
+}
+
+.destination-overlay,
+.destination-overlay.bottom {
+  background-image: linear-gradient(transparent, var(--cuckoo-cream) 88%) !important;
+}
+
+.choose-overlay {
+  background-image: linear-gradient(
+    var(--cuckoo-gold-soft) 2%,
+    transparent 10%,
+    transparent 90%,
+    var(--cuckoo-gold-soft) 98%
+  ) !important;
+}
+
+.section-badge {
+  border-color: rgba(232, 163, 61, 0.42);
+}
+
+.section.black .section-badge {
+  background-color: var(--cuckoo-green-700) !important;
+  background-image: none !important;
+}
+
+.dot,
+.badge-dot {
+  background-color: var(--cuckoo-gold) !important;
+}
+
+.number,
+.arrow {
+  color: var(--cuckoo-forest-700) !important;
+}
+
+.menu-button.w-nav-button {
+  background-color: var(--cuckoo-gold) !important;
+  color: var(--cuckoo-on-green) !important;
+}
+
+.menu-button svg *,
+.arrow svg * {
+  fill: var(--cuckoo-on-green) !important;
+  stroke: var(--cuckoo-on-green) !important;
+}
+
+.footer .footer-link.w--current {
+  background-color: var(--cuckoo-gold) !important;
+  color: var(--cuckoo-on-green) !important;
+}
+
+.submit-button {
+  background-color: var(--cuckoo-green-600) !important;
+  color: var(--cuckoo-paper) !important;
+}
+
+.submit-button.footer {
+  background-color: var(--cuckoo-gold) !important;
+  color: var(--cuckoo-on-green) !important;
+}
+
+.section.black .w-slider {
+  background-color: var(--cuckoo-green-800) !important;
+}
+
+.slider-arrow {
+  border-color: var(--cuckoo-green-600) !important;
+  color: var(--cuckoo-green-600) !important;
+}
+
+.slider-arrow:hover {
+  background-color: var(--cuckoo-green-600) !important;
+  color: var(--cuckoo-paper) !important;
+}
+
+.section.black .slider-arrow {
+  border-color: rgb(255 253 249 / 70%) !important;
+  color: var(--cuckoo-paper) !important;
+}
+
+.section.black .slider-arrow:hover {
+  background-color: var(--cuckoo-paper) !important;
+  color: var(--cuckoo-on-green) !important;
+}
+
+.destination-rating-wrapper,
+.rating-wrap {
+  display: none !important;
+}
+
+.w-form-done {
+  background-color: var(--cuckoo-forest-700) !important;
+  color: var(--cuckoo-paper) !important;
+}
+
+a:hover,
+.link-arrow:hover {
+  color: var(--cuckoo-gold-deep);
+}
+
+@media screen and (max-width: 991px) {
+  .navigation.w-nav-menu {
+    background-color: var(--cuckoo-green-800) !important;
+  }
+}
