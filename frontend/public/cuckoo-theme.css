@@ -247,6 +247,38 @@ body {
   background-size: cover;
 }
 
+.destination-hero-block {
+  background-color: var(--cuckoo-green-900) !important;
+  background-image:
+    linear-gradient(180deg, rgba(40, 60, 23, 0.62) 0%, rgba(54, 80, 31, 0.86) 55%, var(--cuckoo-green-900) 100%),
+    url("https://irp.cdn-website.com/e6c865a4/dms3rep/multi/opt/Victoria-Falls-1+%281%29-1920w.jpeg") !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
+  background-size: cover !important;
+}
+
+.destination-hero-block .inner-hero-heading,
+.destination-hero-block .inner-hero-p {
+  color: var(--cuckoo-paper) !important;
+  text-shadow: 0 1px 3px rgba(16, 24, 12, 0.55);
+}
+
+.package-hero {
+  background-color: var(--cuckoo-green-900) !important;
+  background-image:
+    linear-gradient(180deg, rgba(40, 60, 23, 0.5) 0%, rgba(54, 80, 31, 0.82) 55%, var(--cuckoo-green-900) 100%),
+    url("https://irp.cdn-website.com/e6c865a4/dms3rep/multi/opt/IMG_3957-1920w.JPG") !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
+  background-size: cover !important;
+}
+
+.package-hero .inner-hero-heading,
+.package-hero .inner-hero-p {
+  color: var(--cuckoo-paper) !important;
+  text-shadow: 0 1px 3px rgba(16, 24, 12, 0.55);
+}
+
 .hero-pill-icon {
   color: var(--cuckoo-gold) !important;
 }
