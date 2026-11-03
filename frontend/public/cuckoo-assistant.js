@@ -1,18 +1,29 @@
 (() => {
+  if (window.__cuckooAssistantLoaded) return
+  window.__cuckooAssistantLoaded = true
+
+  const CHAT_ENDPOINT = '/api/chat'
+  const SPLINE_RUNTIME = 'https://unpkg.com/@splinetool/runtime@2.0.130/build/runtime.js'
+  const SPLINE_SCENE = 'https://prod.spline.design/BXI1TuYOOKnkbi3q/scene.splinecode'
+  const MAX_HISTORY = 12
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
   const host = document.createElement('div')
   host.id = 'cuckoo-assistant'
   document.body.append(host)
 
   const shadow = host.attachShadow({ mode: 'open' })
+
   shadow.innerHTML = `
     <style>
       :host {
         --green: #537b2f;
         --green-deep: #36501f;
         --green-ink: #36501f;
-        --on-green: #1b2410;
         --gold: #e8a33d;
+        --gold-soft: #f7e3bf;
         --paper: #fffdf9;
+        --cream: #f4f1e6;
         --ink: #16231d;
         --muted: #68756e;
         font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -21,565 +32,543 @@
 
       * { box-sizing: border-box; }
 
-      .launcher {
+      #stage {
         position: fixed;
-        z-index: 2147483000;
-        right: 24px;
-        bottom: 24px;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        min-height: 58px;
-        padding: 0 20px;
-        border: 0;
-        border-radius: 999px;
-        background: var(--green);
-        color: var(--paper);
-        box-shadow: 0 10px 32px rgb(27 36 16 / 28%);
-        cursor: pointer;
-        font: inherit;
-        font-size: 15px;
-        font-weight: 600;
-        line-height: 1;
-        transition: transform 160ms ease, background 160ms ease, color 160ms ease;
+        inset: 0;
+        z-index: 2147482800;
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity .5s ease;
       }
+      #stage.ready { opacity: 1; }
+      #bird { width: 100%; height: 100%; display: block; background: transparent; }
 
-      .launcher:hover { background: var(--green-deep); color: var(--paper); transform: translateY(-2px); }
-      .launcher:focus-visible, button:focus-visible, textarea:focus-visible {
-        outline: 3px solid var(--gold);
-        outline-offset: 3px;
-      }
-
-      .launcher-icon { width: 21px; height: 21px; fill: none; stroke: currentColor; stroke-width: 1.8; }
-
-      .panel {
+      #hit {
         position: fixed;
-        z-index: 2147483000;
-        right: 24px;
-        bottom: 94px;
-        display: flex;
-        flex-direction: column;
-        width: min(380px, calc(100vw - 32px));
-        height: min(560px, calc(100dvh - 120px));
-        min-height: 340px;
-        overflow: hidden;
-        border: 1px solid rgb(83 123 47 / 24%);
-        border-radius: 20px;
-        background: var(--paper);
-        box-shadow: 0 20px 60px rgb(27 36 16 / 24%);
-      }
-
-      .panel[hidden] { display: none; }
-
-      .header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 18px 20px;
-        background: var(--green);
-        color: var(--paper);
-      }
-
-      .brand { display: flex; align-items: center; gap: 12px; }
-      .avatar {
-        display: grid;
-        width: 40px;
-        height: 40px;
-        place-items: center;
-        border-radius: 50%;
-        background: rgb(255 253 249 / 12%);
-        color: var(--paper);
-      }
-      .avatar svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.8; }
-      .title { margin: 0; font-size: 15px; font-weight: 650; }
-      .subtitle { margin: 3px 0 0; color: var(--paper); font-size: 12px; }
-      .close {
-        display: grid;
-        width: 36px;
-        height: 36px;
-        place-items: center;
+        right: 14px;
+        bottom: calc(14px + var(--cuckoo-banner-offset, 0px));
+        z-index: 2147482900;
+        width: 66px;
+        height: 66px;
+        padding: 0;
         border: 0;
         border-radius: 50%;
         background: transparent;
-        color: var(--paper);
         cursor: pointer;
-        font: inherit;
-        font-size: 24px;
+        outline: none;
       }
-      .close:hover { background: rgb(255 253 249 / 12%); }
-
-      .messages {
-        display: flex;
-        flex: 1;
-        flex-direction: column;
-        gap: 12px;
-        overflow-y: auto;
-        padding: 20px 16px;
-        scroll-behavior: smooth;
-      }
-
-      .message {
-        max-width: 88%;
-        padding: 11px 14px;
-        border-radius: 16px 16px 16px 4px;
-        background: #f0f3ef;
-        color: var(--ink);
-        font-size: 14px;
-        line-height: 1.5;
-        overflow-wrap: anywhere;
-        white-space: pre-wrap;
-      }
-      .message.user {
-        align-self: flex-end;
-        border-radius: 16px 16px 4px 16px;
-        background: var(--green);
-        color: var(--paper);
-      }
-      .message.error { background: #fff0ec; color: #8d3424; }
-      .message.thinking { display: flex; align-items: center; gap: 8px; color: var(--muted); }
-      .message p { margin: 0; }
-      .message p + p { margin-top: .55em; }
-      .message .md-heading { font-weight: 650; }
-      .message .md-list { margin: .4em 0; padding-left: 1.15em; }
-      .message .md-list li + li { margin-top: .25em; }
-      .message code {
-        padding: 1px 5px;
-        border-radius: 5px;
-        background: rgb(0 0 0 / 7%);
-        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-        font-size: .92em;
-      }
-      .message a { color: var(--green-ink); text-decoration: underline; text-underline-offset: 2px; }
-      .dots { display: inline-flex; gap: 3px; }
-      .dots i {
-        width: 5px;
-        height: 5px;
+      #hit::before {
+        content: "";
+        position: absolute;
+        inset: 0;
         border-radius: 50%;
-        background: var(--muted);
-        animation: pulse 1s ease-in-out infinite;
+        background: var(--paper) url("/icon-192.png") center / 58% no-repeat;
+        box-shadow: 0 10px 30px rgb(27 36 16 / 30%);
+        transition: opacity .25s ease, transform .25s ease;
       }
-      .dots i:nth-child(2) { animation-delay: 140ms; }
-      .dots i:nth-child(3) { animation-delay: 280ms; }
-      @keyframes pulse { 0%, 60%, 100% { opacity: .35; transform: translateY(0); } 30% { opacity: 1; transform: translateY(-3px); } }
+      #hit:hover::before { transform: translateY(-2px); }
+      #hit.live::before { opacity: 0; }
+      #hit:focus-visible::before { box-shadow: 0 0 0 3px var(--gold); }
+      #hit.live:focus-visible { outline: 2px solid var(--gold); outline-offset: 6px; }
 
-      .suggestions { padding: 0 0 12px; }
-      .suggestions[hidden] { display: none; }
-      .suggestions-head {
+      #tip {
+        position: fixed;
+        right: 88px;
+        bottom: calc(32px + var(--cuckoo-banner-offset, 0px));
+        z-index: 2147482950;
+        padding: 9px 13px;
+        border-radius: 14px 14px 4px 14px;
+        background: var(--paper);
+        color: var(--green-ink);
+        box-shadow: 0 6px 20px rgb(27 36 16 / 22%);
+        font-size: 13px;
+        font-weight: 600;
+        white-space: nowrap;
+        opacity: 0;
+        transform: translateX(8px) scale(.96);
+        transition: opacity .25s ease, transform .25s ease;
+        pointer-events: none;
+      }
+      #tip.show { opacity: 1; transform: none; }
+
+      #chat {
+        position: fixed;
+        right: 16px;
+        bottom: calc(92px + var(--cuckoo-banner-offset, 0px));
+        z-index: 2147483000;
+        display: flex;
+        flex-direction: column;
+        width: 340px;
+        max-width: calc(100vw - 32px);
+        height: 470px;
+        max-height: calc(100dvh - 120px - var(--cuckoo-banner-offset, 0px));
+        overflow: hidden;
+        border-radius: 20px;
+        background: var(--paper);
+        box-shadow: 0 18px 50px rgb(27 36 16 / 30%);
+        opacity: 0;
+        transform: translateY(16px) scale(.96);
+        transform-origin: bottom right;
+        transition: opacity .25s ease, transform .3s cubic-bezier(.2, 1.3, .4, 1);
+        pointer-events: none;
+      }
+      #chat.open { opacity: 1; transform: none; pointer-events: auto; }
+
+      .head {
         display: flex;
         align-items: center;
         justify-content: space-between;
-        padding: 0 16px 8px;
+        padding: 14px 16px;
+        background: linear-gradient(135deg, var(--green-deep), var(--green));
+        color: var(--paper);
       }
-      .suggestions-label {
-        color: var(--muted);
-        font-size: 11px;
-        font-weight: 650;
-        letter-spacing: .08em;
-        text-transform: uppercase;
+      .head b { display: block; font-size: 15px; }
+      .head small { font-size: 12px; opacity: .88; }
+      .head .dot {
+        display: inline-block;
+        width: 7px;
+        height: 7px;
+        margin-right: 5px;
+        border-radius: 50%;
+        background: #7be08a;
       }
-      .suggestion-controls { display: flex; gap: 5px; }
-      .suggestion-nav {
-        display: grid;
+      #x {
         width: 28px;
         height: 28px;
-        place-items: center;
-        border: 1px solid #dce5de;
+        border: 0;
         border-radius: 50%;
-        background: white;
-        color: var(--green-ink);
+        background: rgb(255 255 255 / 20%);
+        color: #fff;
         cursor: pointer;
         font: inherit;
         font-size: 16px;
-        line-height: 1;
-        transition: background 140ms ease, border-color 140ms ease, opacity 140ms ease;
       }
-      .suggestion-nav:hover:not(:disabled) { border-color: var(--green-deep); background: #f0f3ef; }
-      .suggestion-nav:disabled { opacity: .32; cursor: default; }
-      .suggestion-track {
+      #x:hover { background: rgb(255 255 255 / 30%); }
+
+      #log {
         display: flex;
-        gap: 8px;
-        overflow-x: auto;
-        padding: 0 16px 4px;
-        scroll-behavior: smooth;
-        scroll-padding-inline: 16px;
-        scroll-snap-type: x mandatory;
-        scrollbar-width: none;
-      }
-      .suggestion-track::-webkit-scrollbar { display: none; }
-      .suggestion {
-        display: flex;
-        flex: 0 0 80%;
+        flex: 1;
         flex-direction: column;
-        gap: 3px;
-        padding: 11px 13px;
-        border: 1px solid #dce5de;
+        gap: 8px;
+        overflow-y: auto;
+        padding: 14px;
+        background: var(--cream);
+      }
+      .m {
+        max-width: 82%;
+        padding: 9px 12px;
         border-radius: 14px;
-        background: white;
+        font-size: 14px;
+        line-height: 1.45;
+        overflow-wrap: anywhere;
+        white-space: pre-wrap;
+        animation: pop .25s ease;
+      }
+      .m.bot {
+        align-self: flex-start;
+        border-bottom-left-radius: 4px;
+        background: var(--paper);
+        box-shadow: 0 1px 3px rgb(0 0 0 / 8%);
+      }
+      .m.me {
+        align-self: flex-end;
+        border-bottom-right-radius: 4px;
+        background: var(--green);
+        color: var(--paper);
+      }
+      .m.typing { display: flex; gap: 4px; padding: 12px; }
+      .m.typing i {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: #b99a78;
+        animation: bl 1s infinite;
+      }
+      .m.typing i:nth-child(2) { animation-delay: .15s; }
+      .m.typing i:nth-child(3) { animation-delay: .3s; }
+
+      .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+      .chip {
+        padding: 6px 10px;
+        border: 1px solid #e0d8c4;
+        border-radius: 999px;
+        background: var(--paper);
         color: var(--green-ink);
         cursor: pointer;
         font: inherit;
-        text-align: left;
-        scroll-snap-align: start;
-        transition: border-color 140ms ease, background 140ms ease;
+        font-size: 12px;
       }
-      .suggestion:hover { border-color: var(--green-deep); background: #f0f3ef; }
-      .suggestion-title { font-size: 13px; font-weight: 600; line-height: 1.3; }
-      .suggestion-detail { color: var(--muted); font-size: 11.5px; line-height: 1.35; }
+      .chip:hover { background: var(--gold-soft); }
 
-      .composer {
+      form {
         display: flex;
-        align-items: flex-end;
         gap: 8px;
-        padding: 12px;
-        border-top: 1px solid #e8ece8;
-        background: white;
+        padding: 10px;
+        border-top: 1px solid #ece4d1;
+        background: var(--paper);
       }
-      textarea {
+      input {
         flex: 1;
         min-width: 0;
-        max-height: 100px;
-        resize: none;
-        padding: 10px 12px;
-        border: 1px solid #dce5de;
-        border-radius: 14px;
-        background: white;
+        padding: 9px 14px;
+        border: 1px solid #e0d8c4;
+        border-radius: 999px;
+        background: var(--paper);
         color: var(--ink);
         font: inherit;
         font-size: 14px;
-        line-height: 1.4;
+        outline: none;
       }
-      textarea::placeholder { color: var(--muted); }
-      .send {
-        display: grid;
-        flex: 0 0 40px;
-        width: 40px;
-        height: 40px;
-        place-items: center;
+      input:focus { border-color: var(--gold); }
+      form button {
+        padding: 0 16px;
         border: 0;
-        border-radius: 50%;
-        background: var(--green);
-        color: var(--paper);
+        border-radius: 999px;
+        background: var(--gold);
+        color: #4a2f12;
         cursor: pointer;
+        font: inherit;
+        font-weight: 700;
       }
-      .send:disabled { background: #6b7568; cursor: not-allowed; }
-      .send svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; }
+      form button:disabled { opacity: .55; cursor: not-allowed; }
+
+      @keyframes pop { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+      @keyframes bl { 0%, 80%, 100% { opacity: .3; transform: scale(.8); } 40% { opacity: 1; transform: scale(1.1); } }
 
       @media (max-width: 480px) {
-        .launcher { right: 16px; bottom: 16px; }
-        .panel { right: 8px; bottom: 82px; width: calc(100vw - 16px); height: min(600px, calc(100dvh - 100px)); }
-        .suggestion { flex-basis: 86%; }
+        #chat { right: 8px; bottom: calc(84px + var(--cuckoo-banner-offset, 0px)); width: calc(100vw - 16px); }
       }
 
       @media (prefers-reduced-motion: reduce) {
-        *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; transition-duration: .01ms !important; }
+        * { animation-duration: .01ms !important; transition-duration: .01ms !important; }
       }
     </style>
-    <button class="launcher" type="button" aria-expanded="false" aria-controls="assistant-panel">
-      <svg class="launcher-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 11.5a8.4 8.4 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.4 8.4 0 0 1 3.8-.9h.5a8.5 8.5 0 0 1 8 8v.5Z"/></svg>
-      <span>Ask Cuckoo</span>
-    </button>
-    <section class="panel" id="assistant-panel" role="dialog" aria-label="Cuckoo Safaris assistant" hidden>
-      <header class="header">
-        <div class="brand">
-          <div class="avatar" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3 14 9l6 2-6 2-2 6-2-6-6-2 6-2 2-6Z"/><path d="m19 14 1.2 3.8L24 19l-3.8 1.2L19 24l-1.2-3.8L14 19l3.8-1.2L19 14Z"/></svg></div>
-          <div><p class="title">Cuckoo Safaris</p><p class="subtitle">Your safari planning assistant</p></div>
-        </div>
-        <button class="close" type="button" aria-label="Close assistant">&times;</button>
-      </header>
-      <div class="messages" role="log" aria-live="polite" aria-relevant="additions"></div>
-      <div class="suggestions">
-        <div class="suggestions-head">
-          <span class="suggestions-label">Suggested for you</span>
-          <div class="suggestion-controls">
-            <button class="suggestion-nav" type="button" data-dir="-1" aria-label="Previous suggestions">&#8249;</button>
-            <button class="suggestion-nav" type="button" data-dir="1" aria-label="Next suggestions">&#8250;</button>
-          </div>
-        </div>
-        <div class="suggestion-track"></div>
+
+    <div id="stage"><canvas id="bird" aria-hidden="true"></canvas></div>
+    <div id="tip">Ask Cuckoo AI</div>
+    <button id="hit" type="button" aria-label="Ask Cuckoo AI" aria-expanded="false" aria-controls="chat"></button>
+    <section id="chat" role="dialog" aria-label="Cuckoo AI chat" aria-hidden="true">
+      <div class="head">
+        <div><b>Cuckoo AI</b><small><span class="dot"></span>Your safari planning helper</small></div>
+        <button id="x" type="button" aria-label="Close chat">&times;</button>
       </div>
-      <form class="composer">
-        <textarea rows="1" maxlength="1000" aria-label="Your message" placeholder="Ask us anything..." required></textarea>
-        <button class="send" type="submit" aria-label="Send message">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
-        </button>
+      <div id="log" role="log" aria-live="polite" aria-relevant="additions"></div>
+      <form id="f">
+        <input id="q" type="text" maxlength="1000" placeholder="Ask about safaris…" autocomplete="off" aria-label="Your message" required>
+        <button type="submit">Send</button>
       </form>
     </section>
   `
 
-  const launcher = shadow.querySelector('.launcher')
-  const panel = shadow.querySelector('.panel')
-  const closeButton = shadow.querySelector('.close')
-  const messagesElement = shadow.querySelector('.messages')
-  const suggestions = shadow.querySelector('.suggestions')
-  const suggestionTrack = shadow.querySelector('.suggestion-track')
-  const suggestionNavButtons = shadow.querySelectorAll('.suggestion-nav')
-  const form = shadow.querySelector('.composer')
-  const input = shadow.querySelector('textarea')
-  const sendButton = shadow.querySelector('.send')
+  const $ = (selector) => shadow.querySelector(selector)
+  const stage = $('#stage')
+  const canvas = $('#bird')
+  const hit = $('#hit')
+  const tip = $('#tip')
+  const chat = $('#chat')
+  const log = $('#log')
+  const form = $('#f')
+  const input = $('#q')
+  const closeButton = $('#x')
+  const sendButton = form.querySelector('button')
+
   const history = []
   let pending = false
+  let open = false
+  let bannerOffset = 0
 
-  const suggestionItems = [
-    {
-      title: 'Plan a Victoria Falls trip',
-      detail: 'A relaxed 3-day itinerary',
-      prompt: 'Help me plan a 3-day Victoria Falls trip.',
-    },
-    {
-      title: 'Book a safari',
-      detail: 'Share your dates and details',
-      prompt: 'I want to book a safari. Please help me with the details.',
-    },
-    {
-      title: 'Best time to visit',
-      detail: 'Seasons, wildlife and water levels',
-      prompt: 'What is the best time of year to visit Victoria Falls?',
-    },
-    {
-      title: 'Day tours & activities',
-      detail: 'Victoria Falls and around',
-      prompt: 'What day tours and activities do you offer around Victoria Falls?',
-    },
-    {
-      title: 'Help me choose a package',
-      detail: 'Find the right safari for you',
-      prompt: 'Can you help me choose the right safari package?',
-    },
-    {
-      title: 'Talk to the team',
-      detail: 'Contact Cuckoo Safaris',
-      prompt: 'How can I contact the Cuckoo Safaris team?',
-    },
-  ]
+  function syncBannerOffset() {
+    const banner = document.getElementById('cuckoo-cookie-banner')
+    let height = 0
+    if (banner) {
+      const style = getComputedStyle(banner)
+      const rect = banner.getBoundingClientRect()
+      if (style.display !== 'none' && style.visibility !== 'hidden' && Number(style.opacity) > 0.01) {
+        height = Math.max(0, Math.round(rect.height))
+      }
+    }
+    bannerOffset = height
+    host.style.setProperty('--cuckoo-banner-offset', height + 'px')
+  }
 
-  for (const item of suggestionItems) {
-    const button = document.createElement('button')
-    button.type = 'button'
-    button.className = 'suggestion'
+  syncBannerOffset()
+  window.addEventListener('resize', syncBannerOffset)
+  new MutationObserver(syncBannerOffset).observe(document.body, { childList: true })
+  window.setTimeout(syncBannerOffset, 400)
+  window.setTimeout(syncBannerOffset, 1200)
 
-    const title = document.createElement('span')
-    title.className = 'suggestion-title'
-    title.textContent = item.title
+  function addMessage(text, who) {
+    const node = document.createElement('div')
+    node.className = 'm ' + who
+    if (who === 'typing') node.innerHTML = '<i></i><i></i><i></i>'
+    else node.textContent = text
+    log.appendChild(node)
+    log.scrollTop = log.scrollHeight
+    return node
+  }
 
-    const detail = document.createElement('span')
-    detail.className = 'suggestion-detail'
-    detail.textContent = item.detail
-
-    button.append(title, detail)
-    button.addEventListener('click', () => {
-      setOpen(true)
-      void sendMessage(item.prompt)
+  function addSuggestions() {
+    const wrap = document.createElement('div')
+    wrap.className = 'chips'
+    ;['Best time to visit', 'Popular safaris', 'Plan my trip', 'Contact a guide'].forEach((label) => {
+      const button = document.createElement('button')
+      button.type = 'button'
+      button.className = 'chip'
+      button.textContent = label
+      button.addEventListener('click', () => send(label))
+      wrap.appendChild(button)
     })
-    suggestionTrack.append(button)
+    log.appendChild(wrap)
+    log.scrollTop = log.scrollHeight
   }
 
-  function updateSuggestionNav() {
-    const maxScroll = suggestionTrack.scrollWidth - suggestionTrack.clientWidth - 1
-    suggestionNavButtons.forEach((button) => {
-      button.disabled = Number(button.dataset.dir) < 0
-        ? suggestionTrack.scrollLeft <= 0
-        : suggestionTrack.scrollLeft >= maxScroll
-    })
+  function greet() {
+    addMessage("Hi, I'm Cuckoo! 🐦 I can help you plan your safari. What would you like to know?", 'bot')
+    addSuggestions()
   }
 
-  function scrollSuggestions(direction) {
-    const card = suggestionTrack.querySelector('.suggestion')
-    const gap = 8
-    const step = card ? card.getBoundingClientRect().width + gap : suggestionTrack.clientWidth
-    suggestionTrack.scrollBy({ left: direction * step, behavior: 'smooth' })
+  function fallback(message) {
+    const m = message.toLowerCase()
+    if (/(when|best time|season|month)/.test(m)) return 'The dry season (June to October) is wonderful for game viewing, and Victoria Falls is at its most dramatic around the peak water months. Tell me your dates and I can suggest options.'
+    if (/(price|cost|how much|budget)/.test(m)) return 'Prices depend on the length, season and comfort level. Share your budget and group size and I will point you to the right package.'
+    if (/(popular|safari|tour|package|where)/.test(m)) return 'Our most-loved trips include Victoria Falls day tours, Chobe and Hwange game drives, and multi-country safari packages. Want me to narrow them down?'
+    if (/(contact|guide|human|call|email|book)/.test(m)) return 'I can connect you with one of our safari guides. Leave your email and preferred dates and the Cuckoo Safaris team will be in touch.'
+    if (/(hi|hello|hey)/.test(m)) return 'Hello! 🐦 How can I help with your safari today?'
+    return 'Great question! I can help with destinations, seasons, packages and bookings. What would you like to explore first?'
   }
 
-  suggestionNavButtons.forEach((button) => {
-    button.addEventListener('click', () => scrollSuggestions(Number(button.dataset.dir)))
-  })
-
-  suggestionTrack.addEventListener('scroll', updateSuggestionNav, { passive: true })
-  window.addEventListener('resize', updateSuggestionNav)
-
-  function setOpen(isOpen) {
-    panel.hidden = !isOpen
-    launcher.setAttribute('aria-expanded', String(isOpen))
-    if (isOpen) {
-      input.focus()
-      window.requestAnimationFrame(updateSuggestionNav)
-    } else {
-      launcher.focus()
-    }
-  }
-
-  function appendInline(parent, text) {
-    const pattern = /(\[[^\]]+\]\(https?:\/\/[^)\s]+\)|\*\*[^*\n]+\*\*|__[^_\n]+__|`[^`\n]+`|(?<![*\w])\*(?![\s*])[^*\n]+?(?<![\s*])\*(?![*\w])|(?<![_\w])_(?![\s_])[^_\n]+?(?<![\s_])_(?![_\w]))/g
-    let lastIndex = 0
-    let match
-
-    while ((match = pattern.exec(text)) !== null) {
-      if (match.index > lastIndex) {
-        parent.append(document.createTextNode(text.slice(lastIndex, match.index)))
-      }
-
-      const token = match[0]
-      const link = token.match(/^\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)$/)
-      let element
-
-      if (link) {
-        element = document.createElement('a')
-        element.href = link[2]
-        element.textContent = link[1]
-        element.target = '_blank'
-        element.rel = 'noopener noreferrer'
-      } else if (token.startsWith('**') || token.startsWith('__')) {
-        element = document.createElement('strong')
-        element.textContent = token.slice(2, -2)
-      } else if (token.startsWith('`')) {
-        element = document.createElement('code')
-        element.textContent = token.slice(1, -1)
-      } else {
-        element = document.createElement('em')
-        element.textContent = token.slice(1, -1)
-      }
-
-      parent.append(element)
-      lastIndex = pattern.lastIndex
-    }
-
-    if (lastIndex < text.length) {
-      parent.append(document.createTextNode(text.slice(lastIndex)))
-    }
-  }
-
-  function renderAssistantText(container, text) {
-    const lines = text.replace(/\r\n/g, '\n').split('\n')
-    let list = null
-    let listType = ''
-
-    for (const rawLine of lines) {
-      const line = rawLine.replace(/\s+$/, '')
-
-      if (!line.trim()) {
-        list = null
-        listType = ''
-        continue
-      }
-
-      const heading = line.match(/^\s{0,3}#{1,6}\s+(.*)$/)
-      if (heading) {
-        list = null
-        listType = ''
-        const element = document.createElement('p')
-        element.className = 'md-heading'
-        appendInline(element, heading[1].replace(/\s*#+\s*$/, ''))
-        container.append(element)
-        continue
-      }
-
-      const listItem = line.match(/^\s{0,3}(?:([*\-•])|(\d+)[.)])\s+(.*)$/)
-      if (listItem) {
-        const type = listItem[2] ? 'ol' : 'ul'
-        if (!list || listType !== type) {
-          list = document.createElement(type)
-          list.className = 'md-list'
-          container.append(list)
-          listType = type
-        }
-        const item = document.createElement('li')
-        appendInline(item, listItem[3])
-        list.append(item)
-        continue
-      }
-
-      list = null
-      listType = ''
-      const paragraph = document.createElement('p')
-      appendInline(paragraph, line.replace(/^\s*>\s?/, '').trimStart())
-      container.append(paragraph)
-    }
-  }
-
-  function addMessage(role, text, isError = false) {
-    const bubble = document.createElement('div')
-    bubble.className = `message ${role}${isError ? ' error' : ''}`
-    if (role === 'assistant' && !isError) {
-      renderAssistantText(bubble, text)
-    } else {
-      bubble.textContent = text
-    }
-    messagesElement.append(bubble)
-    messagesElement.scrollTop = messagesElement.scrollHeight
-  }
-
-  function showThinking() {
-    const bubble = document.createElement('div')
-    bubble.className = 'message thinking'
-    bubble.setAttribute('aria-label', 'Thinking')
-    bubble.innerHTML = 'Thinking <span class="dots" aria-hidden="true"><i></i><i></i><i></i></span>'
-    messagesElement.append(bubble)
-    messagesElement.scrollTop = messagesElement.scrollHeight
-    return bubble
-  }
-
-  async function sendMessage(text) {
-    if (pending) return
-
-    pending = true
-    input.disabled = true
-    sendButton.disabled = true
-    suggestions.hidden = true
-    addMessage('user', text)
-    input.value = ''
-    const thinkingBubble = showThinking()
-
+  async function requestReply(message) {
+    if (!CHAT_ENDPOINT) return fallback(message)
     try {
-      const [response] = await Promise.all([
-        fetch('/api/chat', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ message: text, history: history.slice(-12) }),
-        }),
-        new Promise((resolve) => window.setTimeout(resolve, 900)),
-      ])
-      const result = await response.json()
-
-      if (!response.ok) {
-        throw new Error(result.error || 'The assistant is temporarily unavailable. Please try again.')
-      }
-
-      if (typeof result.reply !== 'string' || !result.reply.trim()) {
-        throw new Error('The assistant could not answer that just now. Please try again.')
-      }
-
-      history.push({ role: 'user', text }, { role: 'model', text: result.reply })
-      thinkingBubble.remove()
-      addMessage('assistant', result.reply)
-    } catch (error) {
-      thinkingBubble.remove()
-      const message = error instanceof Error && error.message !== 'Failed to fetch'
-        ? error.message
-        : 'Could not connect to the assistant. Please try again.'
-      addMessage('assistant', message, true)
-    } finally {
-      pending = false
-      input.disabled = false
-      sendButton.disabled = false
-      input.focus()
+      const response = await fetch(CHAT_ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message, history: history.slice(-MAX_HISTORY) }),
+      })
+      const data = await response.json().catch(() => ({}))
+      if (response.ok && typeof data.reply === 'string' && data.reply.trim()) return data.reply.trim()
+      return fallback(message)
+    } catch {
+      return fallback(message)
     }
   }
 
-  launcher.addEventListener('click', () => setOpen(panel.hidden))
-  closeButton.addEventListener('click', () => setOpen(false))
+  async function send(raw) {
+    const message = (raw || '').trim()
+    if (!message || pending) return
+    if (!open) toggle(true)
+
+    addMessage(message, 'me')
+    pending = true
+    sendButton.disabled = true
+    const typing = addMessage('', 'typing')
+
+    const [reply] = await Promise.all([
+      requestReply(message),
+      new Promise((resolve) => window.setTimeout(resolve, 550)),
+    ])
+
+    typing.remove()
+    addMessage(reply, 'bot')
+    history.push({ role: 'user', text: message }, { role: 'model', text: reply })
+    pending = false
+    sendButton.disabled = false
+  }
+
+  function toggle(value) {
+    open = value
+    chat.classList.toggle('open', open)
+    chat.setAttribute('aria-hidden', String(!open))
+    hit.setAttribute('aria-expanded', String(open))
+    if (open) {
+      tip.classList.remove('show')
+      if (!log.children.length) greet()
+      window.setTimeout(() => input.focus(), 250)
+    }
+  }
+
   form.addEventListener('submit', (event) => {
     event.preventDefault()
-    const text = input.value.trim()
-    if (text) void sendMessage(text)
+    const value = input.value
+    input.value = ''
+    send(value)
   })
 
-  input.addEventListener('keydown', (event) => {
-    if (event.key === 'Enter' && !event.shiftKey) {
-      event.preventDefault()
-      form.requestSubmit()
+  closeButton.addEventListener('click', () => toggle(false))
+  hit.addEventListener('click', () => {
+    clickAt = tNow
+    toggle(!open)
+  })
+  hit.addEventListener('mouseenter', () => { if (!open) tip.classList.add('show') })
+  hit.addEventListener('mouseleave', () => tip.classList.remove('show'))
+  hit.addEventListener('focus', () => { if (!open) tip.classList.add('show') })
+  hit.addEventListener('blur', () => tip.classList.remove('show'))
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && open) toggle(false)
+  })
+
+  window.setTimeout(() => {
+    if (!open) {
+      tip.classList.add('show')
+      window.setTimeout(() => tip.classList.remove('show'), 4500)
     }
-  })
+  }, 1800)
 
-  updateSuggestionNav()
+  const objectNames = ['Cuckoo Root', 'Head Pivot', 'Eye L Pivot', 'Eye R Pivot', 'Wing L Pivot', 'Wing R Pivot', 'Tail Pivot']
+  const objects = {}
+  let clickAt = -10
+  let tiltAt = 2.5
+  let tiltDir = 1
+  let blinkAt = 3
+  let tNow = 0
+  let yawCur = 0
 
-  addMessage('assistant', 'Hello! I can help you plan a safari, answer questions about Victoria Falls, or take your booking details. Where would you like to go?')
+  const ease = (p) => 0.5 - Math.cos(Math.PI * Math.min(1, Math.max(0, p))) / 2
+  const bump = (t, start, duration) => {
+    const p = (t - start) / duration
+    return p < 0 || p > 1 ? 0 : Math.sin(Math.PI * p)
+  }
+
+  function setTransform(name, props) {
+    const object = objects[name]
+    if (!object) return
+    if (props.position) {
+      object.position.x = props.position.x
+      object.position.y = props.position.y
+      object.position.z = props.position.z
+    }
+    if (props.rotation) {
+      const toRad = Math.PI / 180
+      object.rotation.x = props.rotation.x * toRad
+      object.rotation.y = props.rotation.y * toRad
+      object.rotation.z = props.rotation.z * toRad
+    }
+    if (props.scale) {
+      object.scale.x = props.scale.x
+      object.scale.y = props.scale.y
+      object.scale.z = props.scale.z
+    }
+  }
+
+  function frame(now) {
+    const t = (now - t0) / 1000
+    tNow = t
+    const vw = window.innerWidth
+    const vh = window.innerHeight
+    const H = 2 * CAM_Z * Math.tan(FOV * Math.PI / 360)
+    const ppu = vh / H
+    const s = ICON_PX / (BIRD_H * ppu)
+    const cx = vw - 14 - 33
+    const cy = vh - bannerOffset - 14 - 33
+    const wx = (cx - vw / 2) / ppu
+    const wy = -(cy - vh / 2) / ppu - BIRD_CY * s
+
+    const STEP_T = 0.65, STEP_Z = 70, STEP_X = 75, WALK_START = 3, WALK_PERIOD = 16, LAT_START = 4
+    let zOff = 0, xOff = 0, hop = 0, waddle = 0, yawTarget = 0
+    if (t >= WALK_START) {
+      const wt = (t - WALK_START) % WALK_PERIOD
+      if (wt < 4 * STEP_T) {
+        const k = Math.floor(wt / STEP_T), p = (wt - k * STEP_T) / STEP_T
+        const from = k < 2 ? k : 4 - k, to = k < 2 ? from + 1 : from - 1
+        zOff = (from + (to - from) * ease(p)) * STEP_Z
+        hop = Math.sin(Math.PI * p)
+        waddle = (k % 2 ? 1 : -1) * hop
+      } else if (wt >= LAT_START && wt < LAT_START + 4 * STEP_T) {
+        const lt = wt - LAT_START
+        const k = Math.floor(lt / STEP_T), p = (lt - k * STEP_T) / STEP_T
+        const from = k < 2 ? k : 4 - k, to = k < 2 ? from + 1 : from - 1
+        xOff = -(from + (to - from) * ease(p)) * STEP_X
+        hop = Math.sin(Math.PI * p)
+        waddle = (k % 2 ? 1 : -1) * hop
+        yawTarget = k < 2 ? -50 : 45
+      }
+    }
+    yawCur += (yawTarget - yawCur) * 0.14
+    const pf = (CAM_Z - zOff) / CAM_Z
+
+    const ck = t - clickAt
+    const b = ck >= 0 && ck < 0.9 ? Math.abs(Math.sin(ck * Math.PI * 2.2)) * Math.exp(-ck * 2.2) : 0
+    const squash = ck >= 0 && ck < 0.9 ? Math.sin(ck * Math.PI * 4.4) * Math.exp(-ck * 3) * 0.06 : 0
+    const float = Math.sin(t * 1.6) * 6 * s + b * 38 * s
+    const sway = Math.sin(t * 0.9) * 3
+
+    setTransform('Cuckoo Root', {
+      position: { x: (wx + xOff) * pf, y: wy * pf + float + hop * 16 * s, z: zOff },
+      rotation: {
+        x: Math.sin(t * 1.2) * 2 + hop * 8,
+        y: -18 + yawCur + sway + (ck >= 0 && ck < 0.7 ? Math.sin(ck * 9) * 10 * Math.exp(-ck * 3) : 0),
+        z: Math.sin(t * 0.7) * 2 + waddle * 7,
+      },
+      scale: { x: s * (1 + squash), y: s * (1 - squash), z: s * (1 + squash) },
+    })
+
+    if (t > tiltAt + 1.6) {
+      tiltAt = t + 2.5 + Math.random() * 4
+      tiltDir = Math.random() < 0.5 ? -1 : 1
+    }
+    const tilt = bump(t, tiltAt, 1.6)
+    const tz = ease(tilt) * 13 * tiltDir
+    setTransform('Head Pivot', { rotation: { x: Math.sin(t * 1.6 + 1) * 2 - b * 8, y: tz * 0.8, z: tz } })
+
+    if (t > blinkAt + 0.2) blinkAt = t + 2.2 + Math.random() * 3.2
+    const bl = bump(t, blinkAt, 0.2)
+    const ey = Math.max(0.08, 1 - bl * 0.95)
+    setTransform('Eye L Pivot', { scale: { x: 1, y: ey, z: 1 } })
+    setTransform('Eye R Pivot', { scale: { x: 1, y: ey, z: 1 } })
+
+    const flap = ck >= 0 && ck < 1 ? Math.sin(ck * Math.PI * 7) * 28 * Math.exp(-ck * 2.2) : 0
+    const w = 5 + Math.sin(t * 2.1) * 4 + flap + bump(t % 7, 5, 1) * 14 * Math.abs(Math.sin(t * 20))
+    setTransform('Wing L Pivot', { rotation: { x: 0, y: 0, z: -w } })
+    setTransform('Wing R Pivot', { rotation: { x: 0, y: 0, z: w } })
+    setTransform('Tail Pivot', { rotation: { x: Math.sin(t * 1.3) * 5 + b * 10, y: 0, z: 0 } })
+
+    requestAnimationFrame(frame)
+  }
+
+  const FOV = 45
+  const CAM_Z = 1000
+  const ICON_PX = 62
+  const BIRD_H = 140
+  const BIRD_CY = 25
+  let t0 = performance.now()
+
+  async function initBird() {
+    if (reduceMotion) return
+    try {
+      const { Application } = await import(SPLINE_RUNTIME)
+      const app = new Application(canvas, {
+        renderMode: 'continuous',
+        renderer: 'webgl',
+        htmlContentMode: 'none',
+      })
+      await app.load(SPLINE_SCENE)
+      app.setBackgroundColor('rgba(0,0,0,0)')
+
+      let found = 0
+      for (const name of objectNames) {
+        const object = app.findObjectByName(name)
+        if (object) {
+          objects[name] = object
+          found += 1
+        }
+      }
+
+      if (!objects['Cuckoo Root']) {
+        console.warn('[Cuckoo AI] The Spline scene did not expose a "Cuckoo Root" object.')
+        app.dispose?.()
+        return
+      }
+
+      console.info('[Cuckoo AI] 3D bird ready (' + found + '/' + objectNames.length + ' parts).')
+      stage.classList.add('ready')
+      hit.classList.add('live')
+      t0 = performance.now()
+      requestAnimationFrame(frame)
+    } catch (error) {
+      console.warn('[Cuckoo AI] 3D bird could not load; using the icon launcher instead.', error)
+    }
+  }
+
+  if (document.readyState === 'complete') initBird()
+  else window.addEventListener('load', initBird, { once: true })
 })()
