@@ -4,6 +4,7 @@
   --cuckoo-forest-700: #174737;
   --cuckoo-forest-600: #23604a;
   --cuckoo-moss: #4f7462;
+  --cuckoo-green-soft: #eef3e2;
   --cuckoo-gold: #e8a33d;
   --cuckoo-gold-deep: #a86415;
   --cuckoo-gold-soft: #f7e3bf;
@@ -72,7 +73,7 @@ body {
 }
 
 .section.blue {
-  background-color: var(--cuckoo-gold-soft) !important;
+  background-color: var(--cuckoo-green-soft) !important;
 }
 
 .blue-line,
@@ -129,6 +130,47 @@ body {
     url("https://lirp.cdn-website.com/e6c865a4/dms3rep/multi/opt/Lion+under+a+thunderstorm-1920w.JPG") !important;
   background-position: center;
   background-size: cover;
+}
+
+.contact-route-hero {
+  display: flex;
+  min-height: 440px;
+  align-items: center;
+  padding: clamp(72px, 12vw, 144px) 24px;
+  background-color: var(--cuckoo-forest-900);
+  background-image:
+    linear-gradient(90deg, rgba(11, 36, 28, 0.88), rgba(11, 36, 28, 0.42)),
+    url("https://irp.cdn-website.com/e6c865a4/dms3rep/multi/opt/Victoria-Falls-1+%281%29-1920w.jpeg");
+  background-position: center;
+  background-size: cover;
+  color: var(--cuckoo-paper);
+  text-align: left;
+}
+
+.contact-route-hero .container {
+  width: min(100%, 1126px);
+  margin: 0 auto;
+}
+
+.contact-route-hero h1 {
+  max-width: 760px;
+  margin: 12px 0;
+  color: var(--cuckoo-paper);
+  font-size: clamp(40px, 7vw, 72px);
+  line-height: 1.05;
+}
+
+.contact-route-hero p {
+  max-width: 620px;
+  color: var(--cuckoo-paper);
+}
+
+.contact-route-hero .contact-route-eyebrow {
+  color: var(--cuckoo-gold);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
 }
 
 .hero-pill-icon {

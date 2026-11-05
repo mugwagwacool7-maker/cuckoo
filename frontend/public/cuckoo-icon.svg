@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Cuckoo Safaris">
+  <defs>
+    <linearGradient id="cuckooBody" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#7eab52"/>
+      <stop offset="1" stop-color="#36501f"/>
+    </linearGradient>
+    <linearGradient id="cuckooHead" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#8cbb5f"/>
+      <stop offset="1" stop-color="#436326"/>
+    </linearGradient>
+    <linearGradient id="cuckooWing" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#6f9a45"/>
+      <stop offset="1" stop-color="#2f471b"/>
+    </linearGradient>
+  </defs>
+  <circle cx="256" cy="256" r="248" fill="#faf7f0"/>
+  <circle cx="256" cy="256" r="232" fill="none" stroke="#537b2f" stroke-width="8" opacity=".22"/>
+  <g transform="translate(64 64) scale(6)">
+    <g transform="translate(64 0) scale(-1 1)">
+      <g>
+        <path d="M22 40 5 50l5-9-7-4 17-3Z" fill="#36501f"/>
+        <path d="M22 37 11 43l4-5-3-3 9-2Z" fill="#537b2f"/>
+      </g>
+      <g fill="none" stroke="#a86415" stroke-width="2" stroke-linecap="round">
+        <path d="M29 51v6M25 57h8"/>
+        <path d="M39 51v6M35 57h8"/>
+      </g>
+      <ellipse cx="34" cy="38" rx="17" ry="14.5" fill="url(#cuckooBody)"/>
+      <ellipse cx="36" cy="41.5" rx="11" ry="9.5" fill="#f7e3bf"/>
+      <ellipse cx="37" cy="39.5" rx="7" ry="5.5" fill="#fffdf9" opacity=".5"/>
+      <g>
+        <path d="M23 31C15 34 15 44 23 48c7 0 9-8 8-15-2-2-5-3-8-2Z" fill="url(#cuckooWing)" stroke="#2f471b" stroke-width=".8"/>
+        <path d="M18 40c4 4 9 6 13 5" fill="none" stroke="#36501f" stroke-width=".8" opacity=".55"/>
+      </g>
+      <g>
+        <circle cx="44" cy="24" r="12" fill="url(#cuckooHead)"/>
+        <path d="M39 12c1-4 5-5 7 0" fill="none" stroke="#436326" stroke-width="2" stroke-linecap="round"/>
+        <path d="M54 22c4 0 8 2 9 4-3 2-6 3-9 3Z" fill="#e8a33d"/>
+        <path d="M54 26c2 .3 4 .5 6 .6" fill="none" stroke="#a86415" stroke-width=".9" stroke-linecap="round"/>
+        <g>
+          <circle cx="48" cy="20.5" r="2.6" fill="#16231d"/>
+          <circle cx="48.9" cy="19.7" r=".8" fill="#fffdf9"/>
+        </g>
+      </g>
+    </g>
+  </g>
+</svg>

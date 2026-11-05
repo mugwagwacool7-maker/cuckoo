@@ -108,6 +108,70 @@ body {
   background-color: var(--cuckoo-forest-900) !important;
 }
 
+.contact-card,
+.contact-map-chip {
+  background-color: var(--cuckoo-green-800) !important;
+  color: var(--cuckoo-paper) !important;
+}
+
+.contact-card :is(.contact-card-eyebrow, .contact-card-title, .contact-card-note),
+.contact-map-chip :is(.contact-chip-title, .contact-chip-note) {
+  color: var(--cuckoo-paper) !important;
+}
+
+.contact-card .contact-icon-circle {
+  background-color: var(--cuckoo-green-700) !important;
+  color: var(--cuckoo-paper) !important;
+  animation: contact-icon-float 3s ease-in-out infinite;
+  will-change: transform;
+}
+
+.contact-card:nth-child(2) .contact-icon-circle {
+  animation-delay: 0.4s;
+}
+
+.contact-card:nth-child(3) .contact-icon-circle {
+  animation-delay: 0.8s;
+}
+
+.contact-card:nth-child(4) .contact-icon-circle {
+  animation-delay: 1.2s;
+}
+
+@keyframes contact-icon-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .contact-card .contact-icon-circle {
+    animation: none;
+  }
+}
+
+.contact-card .contact-card-action {
+  color: var(--cuckoo-gold) !important;
+}
+
+.contact-map {
+  position: relative;
+  overflow: hidden;
+}
+
+.contact-map iframe {
+  display: block;
+  width: 100%;
+  min-height: 420px;
+  height: 100%;
+  border: 0;
+}
+
 .package-icon-wrapper {
   background-color: var(--cuckoo-green-800) !important;
 }
@@ -183,7 +247,7 @@ body {
 }
 
 .section.blue {
-  background-color: var(--cuckoo-gold-soft) !important;
+  background-color: var(--cuckoo-green-soft) !important;
 }
 
 .blue-line {
@@ -245,6 +309,21 @@ body {
     url("https://lirp.cdn-website.com/e6c865a4/dms3rep/multi/opt/Lion+under+a+thunderstorm-1920w.JPG") !important;
   background-position: center;
   background-size: cover;
+}
+
+.contact-hero.contact-bg {
+  background-color: var(--cuckoo-green-900) !important;
+  background-image:
+    linear-gradient(90deg, rgba(40, 60, 23, 0.82), rgba(40, 60, 23, 0.35)),
+    url("https://irp.cdn-website.com/e6c865a4/dms3rep/multi/opt/Victoria-Falls-1+%281%29-1920w.jpeg") !important;
+  background-position: center;
+  background-size: cover;
+}
+
+.contact-hero .inner-hero-heading,
+.contact-hero .about-hero-text {
+  color: var(--cuckoo-paper) !important;
+  text-shadow: 0 1px 3px rgba(16, 24, 12, 0.55);
 }
 
 .destination-hero-block {
