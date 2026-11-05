@@ -2,7 +2,7 @@
   if (window.__cuckooAssistantLoaded) return
   window.__cuckooAssistantLoaded = true
 
-  const CHAT_ENDPOINT = ''
+  const CHAT_ENDPOINT = '/api/chat'
   const MAX_HISTORY = 12
 
   const host = document.createElement('div')
@@ -724,30 +724,30 @@
     addMessage("Hi, I'm Cuckoo, your safari planning assistant. Ask me about the best seasons, our favourite trips, or booking a guide.", 'bot')
   }
 
-  function fallback(message) {
-    const m = message.toLowerCase()
-    if (/(when|best time|season|month)/.test(m)) return 'The dry season (June to October) is wonderful for game viewing, and Victoria Falls is at its most dramatic around the peak water months. Tell me your dates and I can suggest options.'
-    if (/(price|cost|how much|budget)/.test(m)) return 'Prices depend on the length, season and comfort level. Share your budget and group size and I will point you to the right package.'
-    if (/(popular|safari|tour|package|where)/.test(m)) return 'Our most-loved trips include Victoria Falls day tours, Chobe and Hwange game drives, and multi-country safari packages. Want me to narrow them down?'
-    if (/(contact|guide|human|call|email|book)/.test(m)) return 'I can connect you with one of our safari guides. Leave your email and preferred dates and the Cuckoo Safaris team will be in touch.'
-    if (/(hi|hello|hey)/.test(m)) return 'Hello! How can I help with your safari today?'
-    return 'Great question! I can help with destinations, seasons, packages and bookings. What would you like to explore first?'
-  }
-
   async function requestReply(message) {
-    if (!CHAT_ENDPOINT) return fallback(message)
+    if (!CHAT_ENDPOINT) {
+      throw new Error('The assistant is not connected. Please try again later.')
+    }
+
+    let response
     try {
-      const response = await fetch(CHAT_ENDPOINT, {
+      response = await fetch(CHAT_ENDPOINT, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ message, history: history.slice(-MAX_HISTORY) }),
       })
-      const data = await response.json().catch(() => ({}))
-      if (response.ok && typeof data.reply === 'string' && data.reply.trim()) return data.reply.trim()
-      return fallback(message)
     } catch {
-      return fallback(message)
+      throw new Error('I could not connect to the assistant. Please try again in a moment.')
     }
+
+    const data = await response.json().catch(() => ({}))
+    if (!response.ok) {
+      throw new Error(typeof data.error === 'string' ? data.error : 'The assistant request failed. Please try again.')
+    }
+    if (typeof data.reply !== 'string' || !data.reply.trim()) {
+      throw new Error('The assistant returned an empty reply. Please try again.')
+    }
+    return data.reply.trim()
   }
 
   function resizeInput() {
@@ -769,10 +769,26 @@
     status.textContent = 'Cuckoo is thinking...'
     const typing = addTyping()
 
-    const [reply] = await Promise.all([
-      requestReply(message),
-      new Promise((resolve) => window.setTimeout(resolve, 550)),
-    ])
+    let reply
+    try {
+      const results = await Promise.all([
+        requestReply(message),
+        new Promise((resolve) => window.setTimeout(resolve, 550)),
+      ])
+      reply = results[0]
+    } catch (error) {
+      typing.remove()
+      addMessage(
+        error instanceof Error ? error.message : 'I could not connect to the assistant. Please try again in a moment.',
+        'bot',
+        true,
+      )
+      pending = false
+      sendButton.disabled = false
+      status.textContent = 'Your safari planning helper'
+      input.focus()
+      return
+    }
 
     typing.remove()
     addMessage(reply, 'bot')
