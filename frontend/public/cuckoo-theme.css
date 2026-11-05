@@ -511,3 +511,110 @@ a:hover,
     padding: 3px 6px;
   }
 }
+
+/* Booking flow */
+.navigation .navlink.cuckoo-nav-book {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 18px !important;
+  border-radius: 999px;
+  background-color: var(--cuckoo-gold) !important;
+  color: var(--cuckoo-on-green) !important;
+  font-weight: 700;
+  line-height: 1;
+  text-decoration: none !important;
+  text-shadow: none !important;
+  transition:
+    background-color 0.18s ease,
+    transform 0.18s ease;
+}
+
+.navigation .navlink.cuckoo-nav-book:hover {
+  background-color: var(--cuckoo-gold-soft) !important;
+  color: var(--cuckoo-on-green) !important;
+  transform: translateY(-1px);
+}
+
+.cuckoo-book-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 14px;
+  padding: 13px 22px;
+  border-radius: 999px;
+  background-color: var(--cuckoo-gold);
+  color: var(--cuckoo-on-green);
+  font-weight: 700;
+  line-height: 1.1;
+  text-decoration: none;
+  box-shadow: 0 8px 22px rgba(232, 163, 61, 0.3);
+  transition:
+    transform 0.18s ease,
+    box-shadow 0.18s ease,
+    background-color 0.18s ease;
+}
+
+.cuckoo-book-btn:hover {
+  background-color: var(--cuckoo-gold-soft);
+  color: var(--cuckoo-on-green);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 26px rgba(232, 163, 61, 0.35);
+}
+
+.cuckoo-booking-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.cuckoo-booking-note {
+  flex-basis: 100%;
+  margin: 0 0 4px;
+  color: #6b7568;
+  font-size: 12.5px;
+  line-height: 1.5;
+}
+
+.cuckoo-email-btn {
+  padding: 12px 20px;
+  border: 1px solid var(--cuckoo-gold-deep);
+  border-radius: 999px;
+  background-color: transparent;
+  color: var(--cuckoo-gold-deep);
+  font: inherit;
+  font-weight: 700;
+  line-height: 1.1;
+  cursor: pointer;
+  transition:
+    background-color 0.18s ease,
+    color 0.18s ease;
+}
+
+.cuckoo-email-btn:hover {
+  background-color: var(--cuckoo-gold-soft);
+  color: var(--cuckoo-on-green);
+}
+
+.cuckoo-booking-status {
+  margin: 12px 0 0;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background-color: var(--cuckoo-green-soft);
+  color: var(--cuckoo-on-green);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.cuckoo-booking-status a {
+  color: var(--cuckoo-gold-deep);
+  font-weight: 700;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cuckoo-nav-book,
+  .cuckoo-book-btn {
+    transition: none;
+  }
+}
